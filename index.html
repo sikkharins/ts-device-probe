@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'">
+<meta name="robots" content="noindex, nofollow">
+<title>ตรวจความพร้อมเบราว์เซอร์ (หน้าทดสอบ)</title>
+<style>
+  :root { --bg: #f6f6f4; --panel: #ffffff; --text: #1d1d1f; --dim: #5f6368; --line: #d9d9d6; --ok: #137333; --stop: #b3261e; --info: #1a5fb4; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #151515; --panel: #202020; --text: #ececec; --dim: #a0a0a0; --line: #3a3a3a; --ok: #6dd58c; --stop: #ff8a80; --info: #8ab4f8; } }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 16px; background: var(--bg); color: var(--text); font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 760px; margin: 0 auto; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  h2 { font-size: 16px; margin: 0 0 6px; }
+  section { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px; margin: 12px 0; }
+  p { margin: 6px 0; }
+  .dim { color: var(--dim); font-size: 13px; }
+  .warn { color: var(--stop); font-weight: 600; }
+  button { font: inherit; padding: 8px 12px; margin: 4px 6px 4px 0; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--text); cursor: pointer; }
+  button:focus-visible { outline: 2px solid var(--info); outline-offset: 2px; }
+  textarea { width: 100%; min-height: 220px; font: 12px/1.45 ui-monospace, Consolas, monospace; background: var(--bg); color: var(--text); border: 1px solid var(--line); border-radius: 8px; padding: 8px; }
+  code { font-family: ui-monospace, Consolas, monospace; }
+  .badge { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 13px; border: 1px solid currentColor; }
+  .ok { color: var(--ok); } .stop { color: var(--stop); } .info { color: var(--info); }
+</style>
+</head>
+<body>
+<main id="main">
+  <h1>ตรวจความพร้อมเบราว์เซอร์ (หน้าทดสอบ)</h1>
+  <p class="dim">หน้านี้ไม่เกี่ยวกับแอปของร้าน ไม่ต้องล็อกอิน และไม่ส่งข้อมูลออกนอกเครื่อง ใช้แค่พื้นที่ทดสอบของหน้านี้เอง (ชื่อขึ้นต้นด้วย <code>ts_device_probe:</code>) ระหว่างทดสอบ ใช้แอปของร้านในแท็บอื่นต่อได้ตามปกติ</p>
+
+  <section>
+    <h2>ก2 ตรวจอัตโนมัติ</h2>
+    <p id="k2">กำลังตรวจ…</p>
+    <p class="dim">แท็บนี้: <code id="tab">-</code></p>
+  </section>
+
+  <section>
+    <h2>ข1 แย่ง lock ข้ามแท็บ</h2>
+    <p>1) เปิดหน้านี้ไว้หนึ่งแท็บ (แท็บ 1) 2) เปิดหน้านี้อีกแท็บในเบราว์เซอร์เดียวกัน (แท็บ 2) 3) ที่แท็บ 2 กดปุ่มข้างล่าง 4) ปิดแท็บ 1 (แท็บของหน้านี้เท่านั้น) แล้วกลับมาดูผลที่แท็บ 2</p>
+    <button id="b-k1">ข1: ตรวจแท็บอื่น และส่งคำขอแบบเข้าคิว</button>
+  </section>
+
+  <section>
+    <h2>ข2 lock ไม่หลุดเพราะหน้าเงียบ</h2>
+    <p>1) เปิดหน้านี้ใหม่สองแท็บ 2) ปล่อยแท็บ 1 ไว้เฉย ๆ อย่างน้อย 10 นาที (สลับไปแท็บอื่น ย่อหน้าต่าง หรือบนมือถือสลับแอปและปิดจอ) 3) ครบแล้วที่แท็บ 2 กดปุ่มข้างล่าง 4) กลับไปเปิดแท็บ 1 แล้วดูผลที่แท็บ 1</p>
+    <button id="b-k2">ข2: ตรวจหลังพัก 10 นาที</button>
+  </section>
+
+  <section>
+    <h2>ข3 แท็บที่คัดลอกมา</h2>
+    <p>ใช้เมนู "Duplicate tab" (ทำสำเนาแท็บ) ของแท็บนี้ แท็บใหม่จะแสดงผลเอง ถ้าเบราว์เซอร์ไม่มีเมนูนี้ ให้ข้ามข้อนี้ ถ้าแท็บใหม่ไม่มีบรรทัด ข3 ขึ้นในกล่องผลหลังเปิดแล้วสักครู่ ให้บันทึกว่า ไม่ครอบ</p>
+  </section>
+
+  <section>
+    <h2>ข4 รายการค้างรอดการปิด</h2>
+    <p>1) กดปุ่มเขียนรายการทดสอบ 2) (ก) รีโหลดหน้านี้ 3) (ข) ปิดแท็บของหน้านี้ แล้วเปิดหน้านี้ใหม่ ผลจะขึ้นเองหลังเปิด</p>
+    <p class="warn">(ค) ปิดเบราว์เซอร์ทั้งหมด (บนมือถือให้ปัดแอปเบราว์เซอร์ทิ้ง) แล้วเปิดเบราว์เซอร์และหน้านี้ใหม่ ผลจะขึ้นเองหลังเปิด ทำเฉพาะเมื่อเครื่องนี้ไม่มีแท็บหรือหน้าต่างของแอปร้านเปิดอยู่เลย และเจ้าของร้านอนุญาตแล้ว ห้ามปิดแอปของร้านแทนพนักงาน ถ้าไม่แน่ใจให้ข้าม</p>
+    <button id="b-k4">ข4: เขียนรายการทดสอบ</button>
+  </section>
+
+  <section>
+    <h2>ข5 กดย้อนกลับ (bfcache)</h2>
+    <p>กดปุ่มหนึ่งปุ่ม หน้าจะเปลี่ยนไปหน้าถัดไป แล้วกดปุ่มย้อนกลับ (Back) ของเบราว์เซอร์ ผลจะขึ้นเองเมื่อกลับมา ทำทั้งรอบ A และรอบ B</p>
+    <button id="b-k5a">ข5 รอบ A: ไปหน้าถัดไป (ถือ lock)</button>
+    <button id="b-k5b">ข5 รอบ B: ไปหน้าถัดไป (ไม่ถือ lock)</button>
+    <p class="dim">ระหว่างอยู่หน้าถัดไป ถ้าจะดูว่า lock ของแท็บนี้ว่างไหม ให้กดปุ่มนี้จากอีกแท็บ:</p>
+    <button id="b-peek">ตรวจ lock ของแท็บอื่น (ไม่เข้าคิว)</button>
+  </section>
+
+  <section>
+    <h2>ผลทั้งหมด</h2>
+    <p class="dim">ผลจากทุกแท็บของหน้านี้รวมอยู่ที่นี่ คัดลอกข้อความทั้งหมดส่งให้เจ้าของร้าน</p>
+    <textarea id="out" readonly aria-label="ผลการตรวจ"></textarea>
+    <button id="b-copy">คัดลอกผล</button>
+    <button id="b-clean">ลบข้อมูลทดสอบทั้งหมด</button>
+  </section>
+</main>
+
+<main id="next" hidden>
+  <h1>หน้าถัดไป (ข5)</h1>
+  <section><p>กดปุ่มย้อนกลับ (Back) ของเบราว์เซอร์ เพื่อกลับไปหน้าก่อน</p></section>
+</main>
+
+<script>
+"use strict";
+const VERSION = "TSPROBE v1";
+const P = "ts_device_probe:";
+const LOG = P + "log";
+const isNext = new URLSearchParams(location.search).has("next");
+const $ = id => document.getElementById(id);
+const rid = () => Math.random().toString(36).slice(2, 8) + Date.now().toString(36);
+const short = id => (id ? String(id).slice(-6) : "-");
+const clock = () => new Date().toTimeString().slice(0, 8);
+
+function readJSON(storage, key) { try { const raw = storage.getItem(key); return raw ? JSON.parse(raw) : null; } catch { return null; } }
+function writeJSON(storage, key, value) { try { storage.setItem(key, JSON.stringify(value)); return true; } catch { return false; } }
+function remove(storage, key) { try { storage.removeItem(key); } catch { /* reported by the caller's check */ } }
+function keysWith(prefix) { try { return Object.keys(localStorage).filter(k => k.startsWith(prefix)); } catch { return []; } }
+
+const state = { tabId: null, tabLock: null, instance: rid(), reloaded: false, k2: null };
+
+function log(test, outcome, detail) {
+  const list = readJSON(localStorage, LOG) || [];
+  list.push(`${clock()} ${test} [${outcome}] แท็บ ${state.tabId ? short(state.tabId) : "(ยังไม่มีรหัส)"}: ${detail}`);
+  writeJSON(localStorage, LOG, list.slice(-300));
+  render();
+}
+
+function render() {
+  if (isNext) return;
+  const k2 = state.k2;
+  if (k2) {
+    $("k2").innerHTML = `<span class="badge ${k2.pass ? "ok" : "stop"}">${k2.pass ? "ผ่าน" : "หยุด"}</span> secure context: ${k2.secure} · Web Locks: ${k2.locks} · ขอ lock ได้: ${k2.lockGrant} · ถืออยู่แล้วขอซ้ำได้ null: ${k2.ifAvailableNull} · ปล่อยแล้วขอใหม่ได้: ${k2.reacquire} · localStorage: ${k2.local} · sessionStorage: ${k2.session}`;
+  }
+  $("tab").textContent = state.tabId || "-";
+  const head = [
+    `${VERSION} | ${location.origin} | ${new Date().toISOString()}`,
+    `UA: ${navigator.userAgent}`,
+    `display-mode standalone: ${matchMedia("(display-mode: standalone)").matches} | storage.persisted: ${k2 ? k2.persisted : "-"}`,
+    "",
+  ];
+  $("out").value = head.concat(readJSON(localStorage, LOG) || []).join("\n");
+}
+
+// The app's lock pattern (App.jsx acquireProductsLock): resolves with {release, settled} while
+// held, or null (ifAvailable and taken, or refused). A lock is free again once `settled` settles.
+function acquire(name, options = {}) {
+  return new Promise(resolve => {
+    let release = () => {};
+    const held = new Promise(done => { release = done; });
+    let settled = null;
+    try {
+      settled = navigator.locks.request(name, options, lock => {
+        if (!lock) { resolve(null); return undefined; }
+        resolve({ name, release, settled });
+        return held;
+      });
+      settled.catch(() => resolve(null));
+    } catch { resolve(null); }
+  });
+}
+
+async function checkK2() {
+  const r = { secure: window.isSecureContext === true, locks: !!(navigator.locks && navigator.locks.request), lockGrant: false, ifAvailableNull: false, reacquire: false, local: false, session: false, persisted: "n/a" };
+  if (r.locks) {
+    const name = P + "k2:" + state.instance;
+    const grant = await acquire(name);
+    r.lockGrant = !!grant;
+    if (grant) {
+      const second = await acquire(name, { ifAvailable: true });
+      r.ifAvailableNull = second === null;
+      if (second) second.release();
+      grant.release();
+      await grant.settled.catch(() => {});
+      const again = await acquire(name, { ifAvailable: true });
+      r.reacquire = !!again;
+      if (again) again.release();
+    }
+  }
+  try {
+    const key = P + "k2-local";
+    localStorage.setItem(key, "1");
+    const back = localStorage.getItem(key) === "1";
+    localStorage.removeItem(key);
+    r.local = back && localStorage.getItem(key) === null;
+  } catch { r.local = false; }
+  try {
+    const key = P + "k2-session";
+    sessionStorage.setItem(key, "1");
+    r.session = sessionStorage.getItem(key) === "1";
+    sessionStorage.removeItem(key);
+  } catch { r.session = false; }
+  try { r.persisted = navigator.storage && navigator.storage.persisted ? await navigator.storage.persisted() : "n/a"; } catch { r.persisted = "error"; }
+  r.pass = r.secure && r.locks && r.lockGrant && r.ifAvailableNull && r.reacquire && r.local && r.session;
+  state.k2 = r;
+  log("ก2", r.pass ? "ผ่าน" : "หยุด", `secure=${r.secure} locks=${r.locks} grant=${r.lockGrant} ifAvailableNull=${r.ifAvailableNull} reacquire=${r.reacquire} local=${r.local} session=${r.session} persisted=${r.persisted}`);
+}
+
+// The tab lock, as App.jsx takeProductsTabLock: an id another page holds (a duplicated tab) is
+// replaced by a new one, up to 5 tries.
+async function takeTabLock() {
+  const inherited = (() => { try { return sessionStorage.getItem(P + "tab"); } catch { return null; } })();
+  let id = inherited;
+  for (let tries = 0; tries < 5 && !state.tabLock; tries += 1) {
+    if (!id) { id = "tab-" + rid(); try { sessionStorage.setItem(P + "tab", id); } catch { /* the id lives for this page only */ } }
+    const grant = await acquire(P + "tab:" + id, { ifAvailable: true });
+    if (grant) { state.tabId = id; state.tabLock = grant; break; }
+    id = null;
+  }
+  if (!state.tabLock) { log("ข3", "หยุด", "ขอ lock ประจำแท็บไม่ได้ 5 ครั้ง"); return; }
+  if (inherited && inherited !== state.tabId) {
+    log("ข3", "ผ่าน", `แท็บนี้ได้รหัสเดิม ${short(inherited)} มาจาก sessionStorage แต่ lock ของรหัสนั้นไม่ว่าง จึงสร้างรหัสใหม่ ${short(state.tabId)} และได้ lock`);
+  }
+  writeJSON(localStorage, P + "alive:" + state.tabId, { instance: state.instance, startedAt: Date.now() });
+}
+
+const journalKey = id => P + "journal:" + id;
+
+function writeToken() {
+  const entry = { token: rid(), writtenAt: Date.now(), by: state.tabId };
+  if (writeJSON(localStorage, journalKey(state.tabId), entry)) log("ข4", "เริ่ม", `เขียนรายการทดสอบ token ${entry.token} แล้ว ต่อไปให้รีโหลด หรือปิดแท็บแล้วเปิดใหม่`);
+  else log("ข4", "หยุด", "เขียนรายการทดสอบลง localStorage ไม่ได้");
+}
+
+// On load: the own key after a reload (ข4 ก), then the keys of tabs that are gone (ข4 ข/ค): a key
+// whose tab lock is free is copied into the own key, then its old key is removed (the app's order).
+async function checkJournals() {
+  const own = readJSON(localStorage, journalKey(state.tabId));
+  if (own && own.token && state.reloaded) log("ข4 (ก)", "ผ่าน", `หลังโหลดใหม่ยังอ่าน token ${own.token} ได้`);
+  for (const key of keysWith(P + "journal:")) {
+    if (key === journalKey(state.tabId)) continue;
+    const otherId = key.slice((P + "journal:").length);
+    const entry = readJSON(localStorage, key);
+    const grant = await acquire(P + "tab:" + otherId, { ifAvailable: true });
+    if (!grant) { log("ข4", "ข้อมูล", `แท็บ ${short(otherId)} ยังเปิดอยู่ (ถือ lock) จึงยังไม่รับช่วงรายการของแท็บนั้น`); continue; }
+    try {
+      const mine = readJSON(localStorage, journalKey(state.tabId)) || { token: null, adopted: [] };
+      mine.adopted = (mine.adopted || []).concat([entry]);
+      if (!writeJSON(localStorage, journalKey(state.tabId), mine)) { log("ข4", "หยุด", "ย้ายรายการไม่ได้: เขียน localStorage ไม่ได้"); continue; }
+      remove(localStorage, key);
+      remove(localStorage, P + "alive:" + otherId);
+      log("ข4 (ข/ค)", "ผ่าน", `รับช่วง token ${entry && entry.token} จากแท็บ ${short(otherId)} ที่ปิดไปแล้ว ย้ายเข้ารายการของแท็บนี้ แล้วลบ key เก่า`);
+    } finally { grant.release(); }
+  }
+}
+
+function otherTabs() {
+  return keysWith(P + "alive:").map(k => ({ id: k.slice((P + "alive:").length), alive: readJSON(localStorage, k) })).filter(t => t.id !== state.tabId);
+}
+
+async function peekOthers(test, { queue = false, markFreed = false } = {}) {
+  const tabs = otherTabs();
+  if (!tabs.length) { log(test, "ข้อมูล", "ไม่พบแท็บอื่นของหน้านี้ ให้เปิดหน้านี้อีกแท็บก่อน"); return; }
+  for (const { id, alive } of tabs) {
+    const name = P + "tab:" + id;
+    const minutes = alive && alive.startedAt ? Math.floor((Date.now() - alive.startedAt) / 60000) : "?";
+    const grant = await acquire(name, { ifAvailable: true });
+    if (grant) {
+      grant.release();
+      if (markFreed) writeJSON(localStorage, P + "freed:" + id, { at: Date.now(), by: state.tabId });
+      log(test, "ข้อมูล", `lock ของแท็บ ${short(id)} ว่าง (แท็บนั้นเปิดมา ${minutes} นาที) ให้กลับไปเปิดแท็บนั้นเพื่อดูผล`);
+      continue;
+    }
+    log(test, "ผ่าน", `lock ของแท็บ ${short(id)} ยังถูกถืออยู่ (ขอแบบไม่รอได้ null; แท็บนั้นเปิดมา ${minutes} นาที)`);
+    if (queue) {
+      const started = Date.now();
+      log("ข1", "รอ", `ส่งคำขอแบบเข้าคิวแล้ว ถ้าปิดแท็บ ${short(id)} คำขอนี้ควรได้ lock ภายในไม่กี่วินาที`);
+      acquire(name).then(queued => {
+        if (!queued) return;
+        queued.release();
+        remove(localStorage, P + "alive:" + id);
+        log("ข1", "ผ่าน", `คำขอแบบเข้าคิวได้ lock ของแท็บ ${short(id)} หลังรอ ${Math.round((Date.now() - started) / 1000)} วินาที (แท็บนั้นปิดแล้ว)`);
+      });
+    }
+  }
+}
+
+// ข2 seen from the idle tab: another tab freed this tab's lock while this page stayed alive (iii),
+// or this page was discarded and loaded again (ii).
+async function checkFreed(onLoad) {
+  if (!state.tabId) return;
+  const freed = readJSON(localStorage, P + "freed:" + state.tabId);
+  if (!freed) return;
+  remove(localStorage, P + "freed:" + state.tabId);
+  if (onLoad) {
+    log("ข2", "ผ่าน", `ระหว่างพัก lock ของแท็บนี้ว่าง และหน้านี้ถูกโหลดใหม่แล้ว หน้าเดิมจึงไม่อยู่ ถูกต้อง (เบราว์เซอร์ทิ้งหน้า wasDiscarded=${document.wasDiscarded === true})`);
+    return;
+  }
+  let listed = "unknown";
+  try { const q = await navigator.locks.query(); listed = q.held.some(h => h.name === P + "tab:" + state.tabId); } catch { /* query is optional */ }
+  log("ข2", "หยุด", `หน้านี้ยังเปิดอยู่ไม่ได้โหลดใหม่ แต่แท็บ ${short(freed.by)} ขอ lock ของแท็บนี้ได้ (lock ยังอยู่ในรายการ query: ${listed})`);
+}
+
+function goNext(run) {
+  const own = readJSON(localStorage, journalKey(state.tabId));
+  writeJSON(sessionStorage, P + "bf", { run, at: Date.now(), token: own ? own.token : null });
+  if (run === "B" && state.tabLock) { state.tabLock.release(); state.tabLock = null; }
+  location.href = location.pathname + "?next=1";
+}
+
+function reasonsOf(entry) {
+  const out = [];
+  const walk = node => {
+    if (!node) return;
+    for (const r of node.reasons || []) out.push(r.reason || String(r));
+    for (const c of node.children || []) walk(c);
+  };
+  walk(entry && entry.notRestoredReasons);
+  return out.length ? out.join(", ") : "ไม่มีข้อมูลจากเบราว์เซอร์";
+}
+
+// ข5 after a fresh load: the page was not restored from bfcache.
+function checkBfOnLoad() {
+  const bf = readJSON(sessionStorage, P + "bf");
+  if (!bf) return;
+  remove(sessionStorage, P + "bf");
+  const nav = performance.getEntriesByType("navigation")[0];
+  const why = reasonsOf(nav);
+  if (bf.run === "A") log("ข5 รอบ A", "ไม่ครอบ", `หน้าโหลดใหม่ (persisted=false) โหลดใหม่ผ่าน แต่ยังไม่ครอบ bfcache เหตุผล: ${why}`);
+  else log("ข5 รอบ B", "ข้อมูล", `หน้าโหลดใหม่ (persisted=false) เบราว์เซอร์ไม่ได้เก็บหน้านี้ใน bfcache เหตุผล: ${why}`);
+}
+
+// ข5 after a bfcache restore: as App.jsx resumeProductsTab, give back what may still be held, wait
+// (at most 2 s) until it is free, take the tab lock again, and check the test record did not change.
+async function onPageShow(event) {
+  if (!event.persisted || isNext) return;
+  const bf = readJSON(sessionStorage, P + "bf");
+  remove(sessionStorage, P + "bf");
+  const old = state.tabLock;
+  state.tabLock = null;
+  if (old) { old.release(); await Promise.race([old.settled.catch(() => {}), new Promise(done => setTimeout(done, 2000))]); }
+  const grant = state.tabId ? await acquire(P + "tab:" + state.tabId, { ifAvailable: true }) : null;
+  if (grant) state.tabLock = grant;
+  const own = readJSON(localStorage, journalKey(state.tabId));
+  const same = (own ? own.token : null) === (bf ? bf.token : null);
+  if (bf && bf.run === "A") log("ข5 รอบ A", grant && same ? "ผ่าน" : "หยุด", `กลับมาจาก bfcache (persisted=true) ขอ lock ใหม่ได้=${!!grant} รายการทดสอบไม่เปลี่ยน=${same}`);
+  else log("ข5 รอบ B", "ข้อมูล", `กลับมาจาก bfcache (persisted=true) เบราว์เซอร์ทำ bfcache ได้เมื่อหน้าไม่ถือ lock ขอ lock ใหม่ได้=${!!grant}`);
+}
+
+function cleanAll() {
+  if (state.tabLock) { state.tabLock.release(); state.tabLock = null; }
+  for (const key of keysWith(P)) remove(localStorage, key);
+  try { for (const key of Object.keys(sessionStorage).filter(k => k.startsWith(P))) sessionStorage.removeItem(key); } catch { /* nothing to clean */ }
+  state.tabId = null;
+  render();
+  const left = keysWith(P).length;
+  $("out").value += `\n${clock()} ลบข้อมูลทดสอบแล้ว เหลือ key ของหน้านี้ ${left} รายการ (รีโหลดหน้าเพื่อเริ่มใหม่)`;
+}
+
+async function copyOut() {
+  const text = $("out").value;
+  try { await navigator.clipboard.writeText(text); log("ผล", "ข้อมูล", "คัดลอกผลแล้ว"); }
+  catch { $("out").focus(); $("out").select(); }
+}
+
+async function init() {
+  if (isNext) { $("main").hidden = true; $("next").hidden = false; return; }
+  try {
+    state.reloaded = !!sessionStorage.getItem(P + "instance");
+    sessionStorage.setItem(P + "instance", state.instance);
+  } catch { /* sessionStorage failure is reported by ก2 */ }
+  await checkK2();
+  if (state.k2.locks) {
+    await takeTabLock();
+    await checkFreed(true);
+    await checkJournals();
+  }
+  checkBfOnLoad();
+  render();
+  $("b-k1").onclick = () => peekOthers("ข1", { queue: true });
+  $("b-k2").onclick = () => peekOthers("ข2", { markFreed: true });
+  $("b-peek").onclick = () => peekOthers("ข5 ตรวจจากแท็บอื่น");
+  $("b-k4").onclick = writeToken;
+  $("b-k5a").onclick = () => goNext("A");
+  $("b-k5b").onclick = () => goNext("B");
+  $("b-copy").onclick = copyOut;
+  $("b-clean").onclick = cleanAll;
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") checkFreed(false); });
+  window.addEventListener("storage", event => { if (event.key === LOG) render(); });
+}
+
+window.addEventListener("pageshow", onPageShow);
+init();
+</script>
+</body>
+</html>
